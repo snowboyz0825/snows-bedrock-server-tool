@@ -1,2 +1,4 @@
 
 *.kate-swp
+/bedrock-server
+/joinbot
