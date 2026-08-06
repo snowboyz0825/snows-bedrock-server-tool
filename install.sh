@@ -1,11 +1,23 @@
-if ! command -v java >/dev/null 2>&1; then
-    echo "Java is not installed. Please install it to run this script."
-    exit 1
-fi
-
+#if you're stripped down enough not to have python, that's on you.
 if ! command -v python3 >/dev/null 2>&1; then
     echo "Python is not installed. Please install it to run this script."
     exit 1
+fi
+
+if ! command -v java >/dev/null 2>&1; then
+    read -p "java, a dependancy, is not installed. Would you like to install it now? (y/n) " answer
+    case "$answer" in
+        [Yy]* )
+             sudo apt-get install -y default-jdk
+            ;;
+        [Nn]* )
+            echo "Aborted."
+            exit 1
+            ;;
+        * )
+            exit 1
+            ;;
+    esac
 fi
 
 if ! command -v tmux >/dev/null 2>&1; then
@@ -13,6 +25,38 @@ if ! command -v tmux >/dev/null 2>&1; then
     case "$answer" in
         [Yy]* )
              sudo apt-get install -y tmux
+            ;;
+        [Nn]* )
+            echo "Aborted."
+            exit 1
+            ;;
+        * )
+            exit 1
+            ;;
+    esac
+fi
+
+if ! command -v restic >/dev/null 2>&1; then
+    read -p "restic, a dependancy, is not installed. Would you like to install it now? (y/n) " answer
+    case "$answer" in
+        [Yy]* )
+             sudo apt-get install -y restic
+            ;;
+        [Nn]* )
+            echo "Aborted."
+            exit 1
+            ;;
+        * )
+            exit 1
+            ;;
+    esac
+fi
+
+if ! command -v unzip >/dev/null 2>&1; then
+    read -p "unzip, a dependancy, is not installed. Would you like to install it now? (y/n) " answer
+    case "$answer" in
+        [Yy]* )
+             sudo apt-get install -y unzip
             ;;
         [Nn]* )
             echo "Aborted."
