@@ -3,3 +3,6 @@
 /bedrock-server
 /joinbot
 env.json
+/__pycache__
+/joindb
+/backups

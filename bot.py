@@ -155,13 +155,13 @@ def do_verify(dcid, xuid):
     _state.verifyData[str(dcid)] = xuid
     _state.verifyData[xuid] = str(str(dcid))
 
-    with open("/home/scripts/bdshelper/data/verifyData.json", "w") as file:
+    with open("data/verifyData.json", "w") as file:
         json.dump(_state.verifyData, file, indent=2)
 
     # form permissions.json
     _state.permissions = [p for p in _state.permissions if p["xuid"] != xuid]
     _state.permissions.append({"permission": "member", "xuid": xuid})
-    with open("/home/bedrock-server/permissions.json", "w") as permissionFile:
+    with open("/bedrock-server/permissions.json", "w") as permissionFile:
         json.dump(_state.permissions, permissionFile, indent=2)
 
     commun.sendTmuxCommand("mcserver", "permission reload")
@@ -236,7 +236,7 @@ async def unverify(interaction: discord.Interaction):
     _state.permissions.append(
         {"permission": "visitor", "xuid": _state.verifyData[str(interaction.user.id)]}
     )
-    with open("/home/bedrock-server/permissions.json", "w") as permissionFile:
+    with open("bedrock-server/permissions.json", "w") as permissionFile:
         json.dump(_state.permissions, permissionFile, indent=2)
 
     del _state.verifyData[_state.verifyData[str(interaction.user.id)]]
@@ -245,7 +245,7 @@ async def unverify(interaction: discord.Interaction):
             f"You are no longer verified as <@{interaction.user.id}>"
         )
 
-    with open("/home/scripts/bdshelper/data/verifyData.json", "w") as file:
+    with open("data/verifyData.json", "w") as file:
         json.dump(_state.verifyData, file, indent=2)
 
     commun.sendTmuxCommand("mcserver", "permission reload")
@@ -450,7 +450,7 @@ async def restart(
         await asyncio.sleep(15)
         commun.sendTmuxCommand(
             "mcserver",
-            "./bedrock_server 2>&1 | tee -a /home/logs/bedrock-server/server.log",
+            "./bedrock_server 2>&1 | tee -a bedrock-server/server.log",
         )
         
 @force_group.command(
@@ -521,6 +521,7 @@ def post_message(channel_id, content):
 
 
 def run_bot():
-    client.run(
-        ""
-    )
+    try:
+        client.run(_state.env["discord_token"])
+    except Exception as e:
+        print(f"Discord bot failed to start: {e}")

@@ -8,17 +8,20 @@ TNTData = {}
 isBackingUp = False
 lastPlayerStamp = 0
 lastBackupStamp = 0
-consoleLoggerUrl = ""
-playerListUrl = ""
-statInfoUrl = ""
-logFile = "/home/logs/bedrock-server/server.log"
+consoleLoggerUrl = "https://discordapp.com/api/webhooks/1535020116012433511/pSrCE0-sgiHYwicUogMlY00vNOnnGGPJ8SR98fnffA--Q8Um962ZFLh0PoQiygDINa7K"
+playerListUrl = "https://discordapp.com/api/webhooks/1535020116012433511/pSrCE0-sgiHYwicUogMlY00vNOnnGGPJ8SR98fnffA--Q8Um962ZFLh0PoQiygDINa7K"
+statInfoUrl = "https://discordapp.com/api/webhooks/1535020116012433511/pSrCE0-sgiHYwicUogMlY00vNOnnGGPJ8SR98fnffA--Q8Um962ZFLh0PoQiygDINa7K"
+logFile = "bedrock-server/server.log"
 with open("data/verifyData.json", "r") as file:
     verifyData = json.load(file)
-with open("/home/bedrock-server/permissions.json", "r") as perms_file:
+with open("bedrock-server/permissions.json", "r") as perms_file:
     permissions = json.load(perms_file)
 with open("data/friends.json", "r") as friends_file:
+    friends = json.load(friends_file)
 with open("data/userSettings.json", "r") as settings_file:
     userSettings = json.load(settings_file)
+with open("env.json", "r") as env_file:
+    env = json.load(env_file)
 
 playersWithoutBar = []    
     

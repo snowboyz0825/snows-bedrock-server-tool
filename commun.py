@@ -16,3 +16,4 @@ def sendTmuxCommand(session_name, command):
         print(
             f"Error: Could not send command to tmux session '{session_name}'. Is it running?"
         )
+

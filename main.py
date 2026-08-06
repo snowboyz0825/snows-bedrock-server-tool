@@ -32,7 +32,7 @@ def dailyServerRestart():
                 time.sleep(30)
                 commun.sendTmuxCommand(
                     "mcserver",
-                    "./bedrock_server 2>&1 | tee -a /home/logs/bedrock-server/server.log",
+                    "./bedrock_server 2>&1 | tee -a bedrock-server/server.log",
                 )
                 commun.sendWebhook("daily server restart", _state.consoleLoggerUrl)
                 _state.players.clear()
@@ -54,7 +54,7 @@ def statWebhook():
             text=True,
         )
         result_backup_usage =subprocess.run(
-            ["du", "-sb", "/home/backups/nameiibackups"],
+            ["du", "-sb", "backups/"],
             capture_output=True,
             text=True,
         )
@@ -112,7 +112,7 @@ def watcher():  # main processer
                                 }
                             )
                             with open(
-                                "/home/bedrock-server/permissions.json", "w"
+                                "bedrock-server/permissions.json", "w"
                             ) as permission_file:
                                 json.dump(_state.permissions, permission_file, indent=2)
                             commun.sendTmuxCommand("mcserver", "permission reload")
