@@ -1,14 +1,50 @@
+TODO
+
+
+
 install.sh
-    pip install -U discord.py
     sudo apt install -y python3-pip --break-system-packages
+    pip install -U discord.py
     set server.properties to public
         add option to make it private and whitelist people through the bot
     ask for webhook url
         MIGHT add a "discord integration" option that enables/disables the server as a whole
+        would prefer if the bot did it
     create restic repo
+    restic -r backups/ init --insecure-no-password
+    create server.log file
+    START SERVER
+    wait till "Pack Stack"
+        probably better to wait till "Server started."
+    create initial backup
+        unnecessary tbh
+    ask if they want the bot
+        tell to go to
+        inform that most features won't be available without the bot
+    request discord bot token
+        add to env? config?
+    -BOT INSTALL-
+        Welcome message
+        Button to run initialize bot command
+
+
 
 start_server.sh
     ./bedrock_server 2>&1 | tee -a server.log
     kill old tmux session
     make mcserver tmux session
     make joinbot tmux session
+    make bot tmux session
+
+backup.by
+    restic forget --keep-within 3d --keep-hourly 240 --keep-daily 90 --keep-weekly 26 --keep-monthly 120 --prune
+        will probably be ran on restart because it is slow
+
+bot.py
+    initialize command
+        get logging channel/playerlist channel/server stats channel
+        create webhooks
+
+
+
+COMPLETE
