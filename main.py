@@ -184,14 +184,17 @@ def watcher():  # main processer
 
                 if type == "pospoll":
                     _state.posData
-                    username = line.split("Teleported pospoll")[1].split(" to ")[0]
-                    x = float(line.split("Teleported pospoll")[1].split(" to ")[1].split(", ")[0])
-                    y = float(line.split("Teleported pospoll")[1].split(" to ")[1].split(", ")[1]) - 100000
-                    z = float(line.split("Teleported pospoll")[1].split(" to ")[1].split(", ")[2].rstrip())
+                    username = line.split("Teleported pospoll")[1].split(" to ")[0].split(".")[2]
+                    x = float(line.split(" to ")[1].split(", ")[0])
+                    y = float(line.split(" to ")[1].split(", ")[1]) - 100000
+                    z = float(line.split(" to ")[1].split(", ")[2].rstrip())
+                    dimension = line.split("Teleported pospoll")[1].split(" to ")[0].split(".")[1]
+                    
                     _state.posData[username]={}
                     _state.posData[username]["x"]=x
                     _state.posData[username]["y"]=y
                     _state.posData[username]["z"]=z
+                    _state.posData[username]["dimension"]=dimension
                     commun.sendWebhook(str(_state.posData), _state.consoleLoggerUrl)
                     commun.sendWebhook(str(_state.userSettings), _state.consoleLoggerUrl)
 
@@ -214,7 +217,7 @@ with open(_state.logFile, "r") as file:
 def functiontest():
     while True:
         for player in _state.players:
-            commun.sendTmuxCommand("mcserver",f"execute at {player} run summon shulker pospoll{player} ~ ~100000 ~ \n execute at @e[name=pospoll{player}] run tp @e[name=pospoll{player}] ~ ~ ~ \n kill @e[name=pospoll{player}]")
+            commun.sendTmuxCommand("mcserver", f"execute in overworld if entity @a[name=\"{player}\"] run summon shulker pospoll.overworld.{player} ~ ~100000 ~\nexecute in nether if entity @a[name=\"{player}\"] run summon shulker pospoll.nether.{player} ~ ~100000 ~\nexecute in the_end if entity @a[name=\"{player}\"] run summon shulker pospoll.end.{player} ~ ~100000 ~\nexecute at @e[name=pospoll.overworld.{player}] run tp @e[name=pospoll.overworld.{player}] ~ ~ ~\nexecute at @e[name=pospoll.nether.{player}] run tp @e[name=pospoll.nether.{player}] ~ ~ ~\nexecute at @e[name=pospoll.end.{player}] run tp @e[name=pospoll.end.{player}] ~ ~ ~\nkill @e[name=pospoll.overworld.{player}]\nkill @e[name=pospoll.nether.{player}]\nkill @e[name=pospoll.end.{player}]")
         time.sleep(30)
         
     

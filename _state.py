@@ -55,7 +55,8 @@ excludeSubStrings = [
     "Removed tag 'nearestTNT' from ",
     "gamerule doDaylightCycle ",
     "Killed pospoll",
-    "Teleported pospoll"
+    "Teleported pospoll",
+    "Failed to execute 'summon' as [Null]"
 ]
 
 def isDcidOnline(discord_id):
