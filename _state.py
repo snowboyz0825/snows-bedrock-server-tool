@@ -1,5 +1,6 @@
 import json
 
+posData = {}
 sessionDatas = {}
 players = []
 xuid2players = {}
@@ -11,7 +12,10 @@ lastBackupStamp = 0
 consoleLoggerUrl = "https://discordapp.com/api/webhooks/1535020116012433511/pSrCE0-sgiHYwicUogMlY00vNOnnGGPJ8SR98fnffA--Q8Um962ZFLh0PoQiygDINa7K"
 playerListUrl = "https://discordapp.com/api/webhooks/1535020116012433511/pSrCE0-sgiHYwicUogMlY00vNOnnGGPJ8SR98fnffA--Q8Um962ZFLh0PoQiygDINa7K"
 statInfoUrl = "https://discordapp.com/api/webhooks/1535020116012433511/pSrCE0-sgiHYwicUogMlY00vNOnnGGPJ8SR98fnffA--Q8Um962ZFLh0PoQiygDINa7K"
-logFile = "bedrock-server/server.log"
+try:
+    logFile = "bedrock-server/server.log"
+except:
+    print("Log file for bedrock server not present. Either the server hasn;t been started or has been started differently than expected.")
 with open("data/verifyData.json", "r") as file:
     verifyData = json.load(file)
 with open("bedrock-server/permissions.json", "r") as perms_file:
@@ -24,7 +28,7 @@ with open("env.json", "r") as env_file:
     env = json.load(env_file)
 
 playersWithoutBar = []    
-    
+
 excludeSubStrings = [
     "Running AutoCompaction...",
     "say §8§oSaving Paused",
@@ -34,7 +38,7 @@ excludeSubStrings = [
     "say §8§oSaving Resumed",
     "Changes to the world are resumed.",
     "Player connected: ",
-    " Player PartyIdUpdate:  ",
+    "Player PartyIdUpdate:  ",
     "Player Spawned: ",
     "Player disconnected: ",
     "execute at @e[type=tnt] run summon armor_stand TNTFound ~ ~100000 ~",
@@ -50,6 +54,8 @@ excludeSubStrings = [
     "Added tag 'nearestTNT' to ",
     "Removed tag 'nearestTNT' from ",
     "gamerule doDaylightCycle ",
+    "Killed pospoll",
+    "Teleported pospoll"
 ]
 
 def isDcidOnline(discord_id):

@@ -152,6 +152,7 @@ def watcher():  # main processer
                             if not _state.playersWithoutBar:
                                 commun.sendTmuxCommand("mcserver", "gamerule playerwaypoints everyone")
                     playerListHookUpdate()
+                    _state.posData.pop(playerName)
 
                 if type == "tntpos":
                     # get tnt pos
@@ -180,7 +181,20 @@ def watcher():  # main processer
                     
                 if type == "stop":
                     _state.players = []
-                    
+
+                if type == "pospoll":
+                    _state.posData
+                    username = line.split("Teleported pospoll")[1].split(" to ")[0]
+                    x = float(line.split("Teleported pospoll")[1].split(" to ")[1].split(", ")[0])
+                    y = float(line.split("Teleported pospoll")[1].split(" to ")[1].split(", ")[1]) - 100000
+                    z = float(line.split("Teleported pospoll")[1].split(" to ")[1].split(", ")[2].rstrip())
+                    _state.posData[username]={}
+                    _state.posData[username]["x"]=x
+                    _state.posData[username]["y"]=y
+                    _state.posData[username]["z"]=z
+                    commun.sendWebhook(str(_state.posData), _state.consoleLoggerUrl)
+                    commun.sendWebhook(str(_state.userSettings), _state.consoleLoggerUrl)
+
             time.sleep(0.05)
 
 
@@ -197,7 +211,13 @@ with open(_state.logFile, "r") as file:
         for playerName in line.split("INFO] ")[-1].strip().split(", "):
             _state.players.append(playerName.strip())
 
-
+def functiontest():
+    while True:
+        for player in _state.players:
+            commun.sendTmuxCommand("mcserver",f"execute at {player} run summon shulker pospoll{player} ~ ~100000 ~ \n execute at @e[name=pospoll{player}] run tp @e[name=pospoll{player}] ~ ~ ~ \n kill @e[name=pospoll{player}]")
+        time.sleep(30)
+        
+    
 TNTWatchdogThread = threading.Thread(target=tnt.TNTWatchdog, daemon=True)
 TNTWatchdogThread.start()
 
@@ -212,6 +232,9 @@ statThread.start()
 
 botThread = threading.Thread(target=discordBot.run_bot, daemon=True)
 botThread.start()
+
+positionPollingThread = threading.Thread(target=functiontest, daemon=True)
+positionPollingThread.start()
 
 watcher()
 # tail(LOG_FILE)

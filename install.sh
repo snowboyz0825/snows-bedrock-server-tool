@@ -68,6 +68,9 @@ if ! command -v unzip >/dev/null 2>&1; then
     esac
 fi
 
+sudo apt install -y python3-pip
+pip install -U discord.py --break-system-packages 
+
 wget https://www.minecraft.net/bedrockdedicatedserver/bin-linux/bedrock-server-1.26.40.8.zip -O bedrock-server.zip
 
 echo "unzipping bedrock server..."
@@ -80,3 +83,10 @@ mkdir joinbot
 
 wget https://github.com/MCXboxBroadcast/Broadcaster/releases/download/149/MCXboxBroadcastStandalone.jar -P joinbot
 
+touch bedrock-server/server.log
+
+sed -i 's/allow-list=true/allow-list=false/g' bedrock-server/server.properties
+
+tmux new -d -s mcserver
+
+tmux send-keys -t mcserver "cd bedrock-server" enter "chmod +x bedrock_server" enter "./bedrock_server 2>&1 | tee -a server.log" enter

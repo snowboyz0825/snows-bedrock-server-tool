@@ -31,5 +31,7 @@ def determineType(line):
         return "tnttag"
     elif "Server stop requested" in line:
         return "stop"
+    elif "Teleported pospoll" in line:
+        return "pospoll"
     else:
         return "other"

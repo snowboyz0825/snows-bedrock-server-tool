@@ -3,8 +3,8 @@ TODO
 
 
 install.sh
-    sudo apt install -y python3-pip --break-system-packages
-    pip install -U discord.py
+    |sudo apt install -y python3-pip --break-system-packages 
+    |pip install -U discord.py
     set server.properties to public
         add option to make it private and whitelist people through the bot
     ask for webhook url
@@ -13,6 +13,7 @@ install.sh
     create restic repo
     restic -r backups/ init --insecure-no-password
     create server.log file
+    install htop
     START SERVER
     wait till "Pack Stack"
         probably better to wait till "Server started."
@@ -26,6 +27,9 @@ install.sh
     -BOT INSTALL-
         Welcome message
         Button to run initialize bot command
+    make some way for EVERYTHING to restart on server reboot
+        systemd service?
+        likely through start_server.sh
 
 
 
@@ -33,8 +37,12 @@ start_server.sh
     ./bedrock_server 2>&1 | tee -a server.log
     kill old tmux session
     make mcserver tmux session
+        make sure it finishes before starting main python scripts
     make joinbot tmux session
     make bot tmux session
+    make htop tmux session
+        resize it
+        make python script figure out how many cores you have and use it
 
 backup.by
     restic forget --keep-within 3d --keep-hourly 240 --keep-daily 90 --keep-weekly 26 --keep-monthly 120 --prune

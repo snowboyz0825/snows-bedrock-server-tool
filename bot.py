@@ -45,8 +45,7 @@ def on_player_join(playerName, playerXuid, playerPfid, unix):
 
 
 async def _on_player_join(playerName, playerXuid, playerPfid, unix):
-    # do whatever async Discord stuff you want here
-    channel = client.get_channel(1515072853022736456)  # your channel id
+    channel = client.get_channel(1515072853022736456)
     if channel:
         if playerXuid not in _state.verifyData:
             return
@@ -55,16 +54,21 @@ async def _on_player_join(playerName, playerXuid, playerPfid, unix):
         if _state.friends[discord_id]["friends"]:
             friendListRaw = _state.friends[discord_id]["friends"]
             friendPings=""
+            allowedPings=[]
             for i in friendListRaw:
                 cooldowns = _state.friends[i]["settings"].get("ping_cooldowns", {})
                 cooldown = cooldowns.get(discord_id)
                 if cooldown:
                     if int(time.time()) - _state.friends[discord_id].get("last_join", 0) > cooldown:
                         friendPings += f"<@{i}>\n"
+                        allowedPings.append(discord.Object(int(i)))
                 else:
                     friendPings += f"<@{i}>\n"
+                    allowedPings.append(discord.Object(int(i)))
+
             if friendPings:
-                await channel.send(f"<@{discord_id}> is online!\n"+friendPings)
+                await channel.send(f"<@{discord_id}> is online!\n"+friendPings, allowed_mentions=discord.AllowedMentions(users=allowedPings
+                ))
             _state.friends[discord_id]["last_join"]=int(time.time())
 
 
@@ -161,7 +165,7 @@ def do_verify(dcid, xuid):
     # form permissions.json
     _state.permissions = [p for p in _state.permissions if p["xuid"] != xuid]
     _state.permissions.append({"permission": "member", "xuid": xuid})
-    with open("/bedrock-server/permissions.json", "w") as permissionFile:
+    with open("bedrock-server/permissions.json", "w") as permissionFile:
         json.dump(_state.permissions, permissionFile, indent=2)
 
     commun.sendTmuxCommand("mcserver", "permission reload")
@@ -259,6 +263,20 @@ friend_group = app_commands.Group(
     name="friend", description="Friend system - must be verified to use."
 )
 
+@friend_group.command(name="ping", description="pings all of your friends")
+async def invokableFriendPing(interaction: discord.Interaction):
+    if str(interaction.user.id) in _state.verifyData:
+        catchMissingFriendData(str(interaction.user.id))
+        if _state.friends[str(interaction.user.id)]["friends"]:
+            friendPings=""
+            for i in _state.friends[str(interaction.user.id)]["friends"]:
+                friendPings += f"<@{i}>\n"
+            await interaction.response.send_message(
+                friendPings)
+    else:
+        await interaction.response.send_message(
+            "You must be verified to have friends.")
+
 @friend_group.command(
     name="pingcooldown", description="changes the cooldown between friend pings"
 )
@@ -283,6 +301,8 @@ async def ping_cooldown(interaction: discord.Interaction, target: discord.Member
 async def friend_add(interaction: discord.Interaction, recipient: discord.Member):
     if str(recipient.id) in _state.verifyData:
         if str(interaction.user.id) in _state.verifyData:
+            catchMissingFriendData(str(interaction.user.id))
+            catchMissingFriendData(str(recipient.id))
             if str(interaction.user.id) == str(recipient.id):
                 await interaction.response.send_message(
                     "You cannot friend yourself (anymore)"
@@ -294,8 +314,6 @@ async def friend_add(interaction: discord.Interaction, recipient: discord.Member
                 ):
                     await interaction.response.send_message("You are already friends")
                 else:
-                    catchMissingFriendData(str(interaction.user.id))
-                    catchMissingFriendData(str(recipient.id))
                     _state.friends[str(interaction.user.id)]["outgoing"].append(
                         str(recipient.id)
                     )
