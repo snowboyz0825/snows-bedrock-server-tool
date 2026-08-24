@@ -6,3 +6,8 @@ env.json
 /__pycache__
 /joindb
 /backups
+tiles/*
+/map
+/nether
+/data
+.vscode/settings.json

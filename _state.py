@@ -9,15 +9,13 @@ TNTData = {}
 isBackingUp = False
 lastPlayerStamp = 0
 lastBackupStamp = 0
-consoleLoggerUrl = "https://discordapp.com/api/webhooks/1535020116012433511/pSrCE0-sgiHYwicUogMlY00vNOnnGGPJ8SR98fnffA--Q8Um962ZFLh0PoQiygDINa7K"
-playerListUrl = "https://discordapp.com/api/webhooks/1535020116012433511/pSrCE0-sgiHYwicUogMlY00vNOnnGGPJ8SR98fnffA--Q8Um962ZFLh0PoQiygDINa7K"
-statInfoUrl = "https://discordapp.com/api/webhooks/1535020116012433511/pSrCE0-sgiHYwicUogMlY00vNOnnGGPJ8SR98fnffA--Q8Um962ZFLh0PoQiygDINa7K"
+
 try:
     logFile = "bedrock-server/server.log"
 except:
     print("Log file for bedrock server not present. Either the server hasn;t been started or has been started differently than expected.")
-with open("data/verifyData.json", "r") as file:
-    verifyData = json.load(file)
+with open("data/verifyData.json", "r") as verifyFile:
+    verifyData = json.load(verifyFile)
 with open("bedrock-server/permissions.json", "r") as perms_file:
     permissions = json.load(perms_file)
 with open("data/friends.json", "r") as friends_file:
@@ -26,6 +24,12 @@ with open("data/userSettings.json", "r") as settings_file:
     userSettings = json.load(settings_file)
 with open("env.json", "r") as env_file:
     env = json.load(env_file)
+    consoleLoggerUrl = env["consoleLogWebhook"]
+    playerListUrl = env["playerListEditWebhook"]
+    statInfoUrl = env["serverUSageEditWebhook"]
+with open("config.json", "r") as config_file:
+    mainConfig = json.load(config_file)
+
 
 playersWithoutBar = []    
 
@@ -56,7 +60,12 @@ excludeSubStrings = [
     "gamerule doDaylightCycle ",
     "Killed pospoll",
     "Teleported pospoll",
-    "Failed to execute 'summon' as [Null]"
+    "Failed to execute 'execute' as [Null]",
+    "tag 'dim_overworld'",
+    "tag 'dim_nether'"
+    "tag 'dim_end'",
+    "Execute subcommand if block test failed.",
+    "Execute subcommand unless block test failed."
 ]
 
 def isDcidOnline(discord_id):

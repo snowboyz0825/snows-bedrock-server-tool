@@ -33,5 +33,7 @@ def determineType(line):
         return "stop"
     elif "Teleported pospoll" in line:
         return "pospoll"
+    elif "Added tag 'dim_" in line:
+        return "dimpoll"
     else:
         return "other"

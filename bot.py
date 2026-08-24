@@ -418,7 +418,7 @@ tree.add_command(friend_group, guild=discord.Object(id=1240097763480309840))
 
 force_group = app_commands.Group(name="force", description="admin commands")
 
-@force_group.command(name="backup", description="Forcibly links two accounts")
+@force_group.command(name="backup", description="Forces a restic backup")
 async def force_backup(
     interaction: discord.Interaction
 ):
@@ -468,29 +468,15 @@ async def restart(
         await asyncio.sleep(15)
         commun.sendTmuxCommand(
             "mcserver",
-            "./bedrock_server 2>&1 | tee -a bedrock-server/server.log",
+            "./bedrock_server 2>&1 | tee -a server.log",
         )
         
 @force_group.command(
     name="test", description="Runs whatever test snow decide to setup"
 )
-async def test(
-    interaction: discord.Interaction
-):
-    if not (
-        interaction.user.guild_permissions.administrator
-        or any(role.id == 1457323549986521088 for role in interaction.user.roles)
-        ):
-        await interaction.response.send_message(
-            "You must be <@&1240133433045286974> or <@&1457323549986521088> for that command."
-        )
-    else:
-        if _state.players:
-            response = requests.patch(f"{_state.playerListUrl}/messages/1527080499200262314", json={"content":f'{str(_state.players).replace("[","").replace("]","").replace("', ","\n").replace("'","")}'})
-        else:
-            response = requests.patch(f"{_state.playerListUrl}/messages/1527080499200262314", json={"content":"There is no one online."})
-        print(response.status_code)
-        
+async def test(interaction: discord.Interaction, name: str = "Friend"):
+    await interaction.response.send_message(f"Hello, {name}!")
+
         
 tree.add_command(force_group, guild=discord.Object(id=1240097763480309840))
 # admin-jun mod. commands end

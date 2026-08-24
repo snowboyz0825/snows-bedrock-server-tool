@@ -70,7 +70,7 @@ def watcher():  # main processer
             line = file.readline()
             if line:
                 type = parsers.determineType(line)
-                if type == "join":
+                if type == "join": #do all this when a player joins
                     playerName, playerXuid, playerPfid, unix = parsers.parseJoin(line)
                     event = {
                         "joinTime": unix,
@@ -84,7 +84,7 @@ def watcher():  # main processer
                         commun.sendTmuxCommand(
                             "mcserver", "gamerule doDaylightCycle true"
                         )
-                    _state.players.append(playerName)
+                    _state.players.append(playerName) 
                     _state.sessionDatas[playerXuid] = event
                     _state.xuids[playerName] = playerXuid
                     _state.xuid2players[playerXuid] = playerName
@@ -108,7 +108,7 @@ def watcher():  # main processer
                             _state.permissions.append(
                                 {
                                     "permission": "visitor",
-                                    "xuid": playerXuid,  # can use this directly, no need for the xuids lookup
+                                    "xuid": playerXuid,
                                 }
                             )
                             with open(
@@ -152,7 +152,10 @@ def watcher():  # main processer
                             if not _state.playersWithoutBar:
                                 commun.sendTmuxCommand("mcserver", "gamerule playerwaypoints everyone")
                     playerListHookUpdate()
-                    _state.posData.pop(playerName)
+                    if _state.mainConfig["doPlayerTracking"]:
+                        _state.posData.pop(playerName)
+                        with open("www/api/playerPos.json", "w") as posApiFile:
+                            json.dump(_state.posData, posApiFile)
 
                 if type == "tntpos":
                     # get tnt pos
@@ -183,21 +186,23 @@ def watcher():  # main processer
                     _state.players = []
 
                 if type == "pospoll":
-                    _state.posData
-                    username = line.split("Teleported pospoll")[1].split(" to ")[0].split(".")[2]
-                    x = float(line.split(" to ")[1].split(", ")[0])
-                    y = float(line.split(" to ")[1].split(", ")[1]) - 100000
-                    z = float(line.split(" to ")[1].split(", ")[2].rstrip())
-                    dimension = line.split("Teleported pospoll")[1].split(" to ")[0].split(".")[1]
-                    
+                    username = line.split(".")[1].split(" to ")[0]
                     _state.posData[username]={}
+                    _state.posData
+                    x = float(line.split("Teleported pospoll")[1].split(" to ")[1].split(", ")[0])
+                    y = float(line.split("Teleported pospoll")[1].split(" to ")[1].split(", ")[1]) - 100000
+                    z = float(line.split("Teleported pospoll")[1].split(" to ")[1].split(", ")[2].rstrip())
                     _state.posData[username]["x"]=x
                     _state.posData[username]["y"]=y
                     _state.posData[username]["z"]=z
-                    _state.posData[username]["dimension"]=dimension
-                    commun.sendWebhook(str(_state.posData), _state.consoleLoggerUrl)
-                    commun.sendWebhook(str(_state.userSettings), _state.consoleLoggerUrl)
 
+                if type == "dimpoll":
+                    username = line.split("' to ")[1].rstrip()
+                    _state.posData[username]["dimension"]="the_end"
+                    _state.posData[username]["dimension"]=line.split("' to ")[0].split("_")[1]
+                    if len(_state.posData) == len(_state.players):
+                        with open("www/api/playerPos.json", "w") as posApiFile:
+                            json.dump(_state.posData, posApiFile)
             time.sleep(0.05)
 
 
@@ -214,12 +219,13 @@ with open(_state.logFile, "r") as file:
         for playerName in line.split("INFO] ")[-1].strip().split(", "):
             _state.players.append(playerName.strip())
 
-def functiontest():
+def playerPolling():
     while True:
-        for player in _state.players:
-            commun.sendTmuxCommand("mcserver", f"execute in overworld if entity @a[name=\"{player}\"] run summon shulker pospoll.overworld.{player} ~ ~100000 ~\nexecute in nether if entity @a[name=\"{player}\"] run summon shulker pospoll.nether.{player} ~ ~100000 ~\nexecute in the_end if entity @a[name=\"{player}\"] run summon shulker pospoll.end.{player} ~ ~100000 ~\nexecute at @e[name=pospoll.overworld.{player}] run tp @e[name=pospoll.overworld.{player}] ~ ~ ~\nexecute at @e[name=pospoll.nether.{player}] run tp @e[name=pospoll.nether.{player}] ~ ~ ~\nexecute at @e[name=pospoll.end.{player}] run tp @e[name=pospoll.end.{player}] ~ ~ ~\nkill @e[name=pospoll.overworld.{player}]\nkill @e[name=pospoll.nether.{player}]\nkill @e[name=pospoll.end.{player}]")
-        time.sleep(30)
-        
+        if _state.mainConfig["doPlayerTracking"]:
+            for player in _state.players:
+                commun.sendTmuxCommand("mcserver", f"execute at @a[name=\"{player}\"] run summon shulker pospoll.{player} ~ ~100000 ~\nexecute at @e[name=pospoll.{player}] run tp @e[name=pospoll.{player}] ~ ~ ~\nkill @e[name=pospoll.{player}]\nexecute at @a[name=\"{player}\"] run execute if block ~ -64 ~ bedrock run tag @a[name=\"{player}\"] add dim_overworld\nexecute at @a[name=\"{player}\"] run execute if block ~ 127 ~ bedrock run tag @a[name=\"{player}\"] add dim_nether\ntag @a[name=\"{player}\"] remove dim_overworld\ntag @a[name=\"{player}\"] remove dim_nether")
+        time.sleep(len(_state.players)*2)
+
     
 TNTWatchdogThread = threading.Thread(target=tnt.TNTWatchdog, daemon=True)
 TNTWatchdogThread.start()
@@ -236,7 +242,7 @@ statThread.start()
 botThread = threading.Thread(target=discordBot.run_bot, daemon=True)
 botThread.start()
 
-positionPollingThread = threading.Thread(target=functiontest, daemon=True)
+positionPollingThread = threading.Thread(target=playerPolling, daemon=True)
 positionPollingThread.start()
 
 watcher()

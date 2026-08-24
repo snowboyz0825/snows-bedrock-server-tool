@@ -30,6 +30,8 @@ install.sh
     make some way for EVERYTHING to restart on server reboot
         systemd service?
         likely through start_server.sh
+    download unmined
+        https://unmined.net/download/unmined-cli-linux-x64-dev/?tmstv=1786663905
 
 
 
